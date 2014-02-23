@@ -22,21 +22,21 @@
  *
  * For use with setPALevel()
  */
-typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_e ;
+typedef enum { RF24_PA_MIN = 0,RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX, RF24_PA_ERROR } rf24_pa_dbm_t;
 
 /**
  * Data rate.  How fast data moves through the air.
  *
  * For use with setDataRate()
  */
-typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_e;
+typedef enum { RF24_1MBPS = 0, RF24_2MBPS, RF24_250KBPS } rf24_datarate_t;
 
 /**
  * CRC Length.  How big (if any) of a CRC is included.
  *
  * For use with setCRCLength()
  */
-typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e;
+typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_t;
 
 /**
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
@@ -277,13 +277,6 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
   bool write( const void* buf, uint8_t len );
 
   /**
-   * Test whether there are bytes available to be read
-   *
-   * @return True if there is a payload available, false if none is
-   */
-  bool available(void);
-
-  /**
    * Read the payload
    *
    * Return the last payload received
@@ -461,17 +454,17 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    *
    * @param level Desired PA level.
    */
-  void setPALevel( rf24_pa_dbm_e level ) ;
+  void setPALevel( rf24_pa_dbm_t level ) ;
 
   /**
    * Fetches the current PA level.
    *
-   * @return Returns a value from the rf24_pa_dbm_e enum describing
+   * @return Returns a value from the rf24_pa_dbm_t enum describing
    * the current PA setting. Please remember, all values represented
    * by the enum mnemonics are negative dBm. See setPALevel for
    * return value descriptions.
    */
-  rf24_pa_dbm_e getPALevel( void ) ;
+  rf24_pa_dbm_t getPALevel( void ) ;
 
   /**
    * Set the transmission data rate
@@ -481,30 +474,30 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param speed RF24_250KBPS for 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS for 2Mbps
    * @return true if the change was successful
    */
-  bool setDataRate(rf24_datarate_e speed);
+  bool setDataRate(rf24_datarate_t speed);
   
   /**
    * Fetches the transmission data rate
    *
    * @return Returns the hardware's currently configured datarate. The value
    * is one of 250kbs, RF24_1MBPS for 1Mbps, or RF24_2MBPS, as defined in the
-   * rf24_datarate_e enum.
+   * rf24_datarate_t enum.
    */
-  rf24_datarate_e getDataRate( void ) ;
+  rf24_datarate_t getDataRate( void ) ;
 
   /**
    * Set the CRC length
    *
    * @param length RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
-  void setCRCLength(rf24_crclength_e length);
+  void setCRCLength(rf24_crclength_t length);
 
   /**
    * Get the CRC length
    *
    * @return RF24_DISABLED if disabled or RF24_CRC_8 for 8-bit or RF24_CRC_16 for 16-bit
    */
-  rf24_crclength_e getCRCLength(void);
+  rf24_crclength_t getCRCLength(void);
 
   /**
    * Disable CRC validation

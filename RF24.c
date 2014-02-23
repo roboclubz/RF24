@@ -16,7 +16,7 @@
 #ifdef NPRINT
 #define PRINT(VAL)
 #else
-#define PRINT(VAL) printf()
+#define PRINT(VAL) (VAL)
 #endif
 
 inline void delay(int delay)
@@ -33,7 +33,7 @@ inline void delayMicroseconds(int delay)
 
 /****************************************************************************/
 
-inline void csn(int mode)
+inline void csn(uint8_t mode)
 {
   // Minimum ideal SPI bus speed is 2x data rate
   // If we assume 2Mbs data rate and 16Mhz clock, a
@@ -57,7 +57,7 @@ inline void csn(int mode)
 
 /****************************************************************************/
 
-inline void ce(int level)
+inline void ce(uint8_t level)
 {
   // digitalWrite(ce_pin,level);
   if (level)
@@ -120,7 +120,7 @@ uint8_t writeRegChar(uint8_t reg, uint8_t value)
 {
   uint8_t status;
 
-  PRINT("writeRegChar(%02x,%02x)\r\n",reg,value);
+  PRINT(printf(PSTR("writeRegChar(%02x,%02x)\r\n"),reg,value));
 
   csn(LOW);
   status = spiSendData( W_REGISTER | ( REGISTER_MASK & reg ) );
@@ -217,25 +217,25 @@ uint8_t get_status(void)
 
 void print_status(uint8_t status)
 {
-  printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
+  PRINT(printf_P(PSTR("STATUS\t\t = 0x%02x RX_DR=%x TX_DS=%x MAX_RT=%x RX_P_NO=%x TX_FULL=%x\r\n"),
            status,
            (status & _BV(RX_DR))?1:0,
            (status & _BV(TX_DS))?1:0,
            (status & _BV(MAX_RT))?1:0,
            ((status >> RX_P_NO) & B111),
            (status & _BV(TX_FULL))?1:0
-          );
+          ));
 }
 
 /****************************************************************************/
 
 void print_observe_tx(uint8_t value)
 {
-  printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\r\n"),
+  PRINT(printf_P(PSTR("OBSERVE_TX=%02x: POLS_CNT=%x ARC_CNT=%x\r\n"),
            value,
            (value >> PLOS_CNT) & B1111,
            (value >> ARC_CNT) & B1111
-          );
+          ));
 }
 
 /****************************************************************************/
@@ -243,10 +243,10 @@ void print_observe_tx(uint8_t value)
 void print_byte_register(const char* name, uint8_t reg, uint8_t qty)
 {
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
+  PRINT(printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab));
   while (qty--)
-    printf_P(PSTR(" 0x%02x"),readRegChar(reg++));
-  printf_P(PSTR("\r\n"));
+    PRINT(printf_P(PSTR(" 0x%02x"),readRegChar(reg++)));
+  PRINT(printf_P(PSTR("\r\n")));
 }
 
 /****************************************************************************/
@@ -254,20 +254,20 @@ void print_byte_register(const char* name, uint8_t reg, uint8_t qty)
 void print_address_register(const char* name, uint8_t reg, uint8_t qty)
 {
   char extra_tab = strlen_P(name) < 8 ? '\t' : 0;
-  printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab);
+  PRINT(printf_P(PSTR(PRIPSTR"\t%c ="),name,extra_tab));
 
   while (qty--)
   {
     uint8_t buffer[5];
     readRegBuff(reg++,buffer,sizeof buffer);
 
-    printf_P(PSTR(" 0x"));
+    PRINT(printf_P(PSTR(" 0x")));
     uint8_t* bufptr = buffer + sizeof buffer;
     while( --bufptr >= buffer )
-      printf_P(PSTR("%02x"),*bufptr);
+      PRINT(printf_P(PSTR("%02x"),*bufptr));
   }
 
-  printf_P(PSTR("\r\n"));
+  PRINT(printf_P(PSTR("\r\n")));
 }
 
 /****************************************************************************/
@@ -307,37 +307,37 @@ uint8_t getPayloadSize(void)
 
 /****************************************************************************/
 
-static const char rf24_datarate_e_str_0[] PROGMEM = "1MBPS";
-static const char rf24_datarate_e_str_1[] PROGMEM = "2MBPS";
-static const char rf24_datarate_e_str_2[] PROGMEM = "250KBPS";
-static const char * const rf24_datarate_e_str_P[] PROGMEM = {
-  rf24_datarate_e_str_0,
-  rf24_datarate_e_str_1,
-  rf24_datarate_e_str_2,
+static const char rf24_datarate_t_str_0[] PROGMEM = "1MBPS";
+static const char rf24_datarate_t_str_1[] PROGMEM = "2MBPS";
+static const char rf24_datarate_t_str_2[] PROGMEM = "250KBPS";
+static const char * const rf24_datarate_t_str_P[] PROGMEM = {
+  rf24_datarate_t_str_0,
+  rf24_datarate_t_str_1,
+  rf24_datarate_t_str_2,
 };
-static const char rf24_model_e_str_0[] PROGMEM = "nRF24L01";
-static const char rf24_model_e_str_1[] PROGMEM = "nRF24L01+";
-static const char * const rf24_model_e_str_P[] PROGMEM = {
-  rf24_model_e_str_0,
-  rf24_model_e_str_1,
+static const char rf24_model_t_str_0[] PROGMEM = "nRF24L01";
+static const char rf24_model_t_str_1[] PROGMEM = "nRF24L01+";
+static const char * const rf24_model_t_str_P[] PROGMEM = {
+  rf24_model_t_str_0,
+  rf24_model_t_str_1,
 };
-static const char rf24_crclength_e_str_0[] PROGMEM = "Disabled";
-static const char rf24_crclength_e_str_1[] PROGMEM = "8 bits";
-static const char rf24_crclength_e_str_2[] PROGMEM = "16 bits" ;
-static const char * const rf24_crclength_e_str_P[] PROGMEM = {
-  rf24_crclength_e_str_0,
-  rf24_crclength_e_str_1,
-  rf24_crclength_e_str_2,
+static const char rf24_crclength_t_str_0[] PROGMEM = "Disabled";
+static const char rf24_crclength_t_str_1[] PROGMEM = "8 bits";
+static const char rf24_crclength_t_str_2[] PROGMEM = "16 bits" ;
+static const char * const rf24_crclength_t_str_P[] PROGMEM = {
+  rf24_crclength_t_str_0,
+  rf24_crclength_t_str_1,
+  rf24_crclength_t_str_2,
 };
-static const char rf24_pa_dbm_e_str_0[] PROGMEM = "PA_MIN";
-static const char rf24_pa_dbm_e_str_1[] PROGMEM = "PA_LOW";
-static const char rf24_pa_dbm_e_str_2[] PROGMEM = "LA_MED";
-static const char rf24_pa_dbm_e_str_3[] PROGMEM = "PA_HIGH";
-static const char * const rf24_pa_dbm_e_str_P[] PROGMEM = { 
-  rf24_pa_dbm_e_str_0,
-  rf24_pa_dbm_e_str_1,
-  rf24_pa_dbm_e_str_2,
-  rf24_pa_dbm_e_str_3,
+static const char rf24_pa_dbm_t_str_0[] PROGMEM = "PA_MIN";
+static const char rf24_pa_dbm_t_str_1[] PROGMEM = "PA_LOW";
+static const char rf24_pa_dbm_t_str_2[] PROGMEM = "LA_MED";
+static const char rf24_pa_dbm_t_str_3[] PROGMEM = "PA_HIGH";
+static const char * const rf24_pa_dbm_t_str_P[] PROGMEM = { 
+  rf24_pa_dbm_t_str_0,
+  rf24_pa_dbm_t_str_1,
+  rf24_pa_dbm_t_str_2,
+  rf24_pa_dbm_t_str_3,
 };
 
 void printDetails(void)
@@ -356,10 +356,10 @@ void printDetails(void)
   print_byte_register(PSTR("CONFIG"),CONFIG);
   print_byte_register(PSTR("DYNPD/FEATURE"),DYNPD,2);
 
-  printf_P(PSTR("Data Rate\t = %S\r\n"),pgm_read_word(&rf24_datarate_e_str_P[getDataRate()]));
-  printf_P(PSTR("Model\t\t = %S\r\n"),pgm_read_word(&rf24_model_e_str_P[isPVariant()]));
-  printf_P(PSTR("CRC Length\t = %S\r\n"),pgm_read_word(&rf24_crclength_e_str_P[getCRCLength()]));
-  printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_e_str_P[getPALevel()]));
+  PRINT(printf_P(PSTR("Data Rate\t = %S\r\n"),pgm_read_word(&rf24_datarate_t_str_P[getDataRate()])));
+  PRINT(printf_P(PSTR("Model\t\t = %S\r\n"),pgm_read_word(&rf24_model_t_str_P[isPVariant()])));
+  PRINT(printf_P(PSTR("CRC Length\t = %S\r\n"),pgm_read_word(&rf24_crclength_t_str_P[getCRCLength()])));
+  PRINT(printf_P(PSTR("PA Power\t = %S\r\n"),pgm_read_word(&rf24_pa_dbm_t_str_P[getPALevel()])));
 }
 
 /****************************************************************************/
@@ -565,13 +565,6 @@ uint8_t getDynamicPayloadSize(void)
   csn(HIGH);
 
   return result;
-}
-
-/****************************************************************************/
-
-bool available(void)
-{
-  return available(NULL);
 }
 
 /****************************************************************************/
@@ -825,7 +818,7 @@ bool testRPD(void)
 
 /****************************************************************************/
 
-void setPALevel(rf24_pa_dbm_e level)
+void setPALevel(rf24_pa_dbm_t level)
 {
   uint8_t setup = readRegChar(RF_SETUP) ;
   setup &= ~(_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
@@ -858,9 +851,9 @@ void setPALevel(rf24_pa_dbm_e level)
 
 /****************************************************************************/
 
-rf24_pa_dbm_e getPALevel(void)
+rf24_pa_dbm_t getPALevel(void)
 {
-  rf24_pa_dbm_e result = RF24_PA_ERROR ;
+  rf24_pa_dbm_t result = RF24_PA_ERROR ;
   uint8_t power = readRegChar(RF_SETUP) & (_BV(RF_PWR_LOW) | _BV(RF_PWR_HIGH)) ;
 
   // switch uses RAM (evil!)
@@ -886,7 +879,7 @@ rf24_pa_dbm_e getPALevel(void)
 
 /****************************************************************************/
 
-bool setDataRate(rf24_datarate_e speed)
+bool setDataRate(rf24_datarate_t speed)
 {
   bool result = false;
   uint8_t setup = readRegChar(RF_SETUP) ;
@@ -933,9 +926,9 @@ bool setDataRate(rf24_datarate_e speed)
 
 /****************************************************************************/
 
-rf24_datarate_e getDataRate( void )
+rf24_datarate_t getDataRate( void )
 {
-  rf24_datarate_e result ;
+  rf24_datarate_t result ;
   uint8_t dr = readRegChar(RF_SETUP) & (_BV(RF_DR_LOW) | _BV(RF_DR_HIGH));
   
   // switch uses RAM (evil!)
@@ -960,7 +953,7 @@ rf24_datarate_e getDataRate( void )
 
 /****************************************************************************/
 
-void setCRCLength(rf24_crclength_e length)
+void setCRCLength(rf24_crclength_t length)
 {
   uint8_t config = readRegChar(CONFIG) & ~( _BV(CRCO) | _BV(EN_CRC)) ;
   
@@ -983,9 +976,9 @@ void setCRCLength(rf24_crclength_e length)
 
 /****************************************************************************/
 
-rf24_crclength_e getCRCLength(void)
+rf24_crclength_t getCRCLength(void)
 {
-  rf24_crclength_e result = RF24_CRC_DISABLED;
+  rf24_crclength_t result = RF24_CRC_DISABLED;
   uint8_t config = readRegChar(CONFIG) & ( _BV(CRCO) | _BV(EN_CRC)) ;
 
   if ( config & _BV(EN_CRC ) )
