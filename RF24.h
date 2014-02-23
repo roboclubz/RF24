@@ -72,7 +72,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    *
    * @param mode HIGH to take this unit off the SPI bus, LOW to put it on
    */
-  void csn(int mode);
+  inline void csn(int mode);
 
   /**
    * Set chip enable
@@ -80,7 +80,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param level HIGH to actively begin transmission or LOW to put in standby.  Please see data sheet
    * for a much more detailed description of this pin.
    */
-  void ce(int level);
+  inline void ce(int level);
 
   /**
    * Read a chunk of data in from a register
@@ -90,7 +90,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param len How many bytes of data to transfer
    * @return Current value of status register
    */
-  uint8_t read_register(uint8_t reg, uint8_t* buf, uint8_t len);
+  uint8_t readRegBuff(uint8_t reg, uint8_t* buf, uint8_t len);
 
   /**
    * Read single byte from a register
@@ -98,7 +98,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param reg Which register. Use constants from nRF24L01.h
    * @return Current value of register @p reg
    */
-  uint8_t read_register(uint8_t reg);
+  uint8_t readRegChar(uint8_t reg);
 
   /**
    * Write a chunk of data to a register
@@ -108,7 +108,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param len How many bytes of data to transfer
    * @return Current value of status register
    */
-  uint8_t write_register(uint8_t reg, const uint8_t* buf, uint8_t len);
+  uint8_t writeRegBuff(uint8_t reg, const uint8_t* buf, uint8_t len);
 
   /**
    * Write a single byte to a register
@@ -117,7 +117,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param value The new value to write
    * @return Current value of status register
    */
-  uint8_t write_register(uint8_t reg, uint8_t value);
+  uint8_t writeRegChar(uint8_t reg, uint8_t value);
 
   /**
    * Write the transmit payload
@@ -128,7 +128,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param len Number of bytes to be sent
    * @return Current value of status register
    */
-  uint8_t write_payload(const void* buf, uint8_t len);
+  uint8_t write_payload(const uint8_t* buf, uint8_t len);
 
   /**
    * Read the receive payload
@@ -139,7 +139,7 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
    * @param len Maximum number of bytes to read
    * @return Current value of status register
    */
-  uint8_t read_payload(void* buf, uint8_t len);
+  uint8_t read_payload(unit8_t* buf, uint8_t len);
 
   /**
    * Empty the receive buffer
@@ -215,7 +215,6 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
   void toggle_features(void);
   /**@}*/
 
-public:
   /**
    * @name Primary public interface
    *
