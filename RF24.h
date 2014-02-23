@@ -42,9 +42,6 @@ typedef enum { RF24_CRC_DISABLED = 0, RF24_CRC_8, RF24_CRC_16 } rf24_crclength_e
  * Driver for nRF24L01(+) 2.4GHz Wireless Transceiver
  */
 
-class RF24
-{
-private:
   uint8_t ce_pin; /**< "Chip Enable" pin, activates the RX or TX role */
   uint8_t csn_pin; /**< SPI Chip select */
   bool wide_band; /* 2Mbs data rate in use? */
@@ -54,8 +51,8 @@ private:
   bool dynamic_payloads_enabled; /**< Whether dynamic payloads are enabled. */ 
   uint8_t ack_payload_length; /**< Dynamic size of pending ack payload. */
   uint64_t pipe0_reading_address; /**< Last address set on pipe 0 for reading. */
-
-protected:
+ 
+ 
   /**
    * @name Low-level internal interface.
    *
@@ -645,9 +642,6 @@ public:
    * @return true if this is a legitimate radio 
    */
   bool isValid() { return ce_pin != 0xff && csn_pin != 0xff; } 
-
-  /**@}*/
-};
 
 /**
  * @example GettingStarted.pde
