@@ -132,11 +132,9 @@ uint8_t writeRegChar(uint8_t reg, uint8_t value)
 
 /****************************************************************************/
 
-uint8_t write_payload(const void* buf, uint8_t len)
+uint8_t write_payload(const uint8_t* buf, uint8_t len)
 {
   uint8_t status;
-
-  const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
 
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
@@ -146,7 +144,7 @@ uint8_t write_payload(const void* buf, uint8_t len)
   csn(LOW);
   status = spiSendData( W_TX_PAYLOAD );
   while ( data_len-- )
-    spiSendData(*current++);
+    spiSendData(*buf++);
   while ( blank_len-- )
     spiSendData(0);
   csn(HIGH);
@@ -156,10 +154,9 @@ uint8_t write_payload(const void* buf, uint8_t len)
 
 /****************************************************************************/
 
-uint8_t read_payload(void* buf, uint8_t len)
+uint8_t read_payload(unit8_t* buf, uint8_t len)
 {
   uint8_t status;
-  uint8_t* current = reinterpret_cast<uint8_t*>(buf);
 
   uint8_t data_len = min(len,payload_size);
   uint8_t blank_len = dynamic_payloads_enabled ? 0 : payload_size - data_len;
@@ -169,7 +166,7 @@ uint8_t read_payload(void* buf, uint8_t len)
   csn(LOW);
   status = spiSendData( R_RX_PAYLOAD );
   while ( data_len-- )
-    *current++ = spiSendData(0xff);
+    *buf++ = spiSendData(0xff);
   while ( blank_len-- )
     spiSendData(0xff);
   csn(HIGH);
@@ -437,7 +434,7 @@ void startListening(void)
 
   // Restore the pipe0 adddress, if exists
   if (pipe0_reading_address)
-    writeRegBuff(RX_ADDR_P0, reinterpret_cast<const uint8_t*>(&pipe0_reading_address), 5);
+    writeRegBuff(RX_ADDR_P0, (&pipe0_reading_address), 5);
 
   // Flush buffers
   flush_rx();
@@ -643,8 +640,8 @@ void openWritingPipe(uint64_t value)
   // Note that AVR 8-bit uC's store this LSB first, and the NRF24L01(+)
   // expects it LSB first too, so we're good.
 
-  writeRegBuff(RX_ADDR_P0, reinterpret_cast<uint8_t*>(&value), 5);
-  writeRegBuff(TX_ADDR, reinterpret_cast<uint8_t*>(&value), 5);
+  writeRegBuff(RX_ADDR_P0, (&value), 5);
+  writeRegBuff(TX_ADDR, (&value), 5);
 
   const uint8_t max_payload_size = 32;
   writeRegChar(RX_PW_P0,min(payload_size,max_payload_size));
@@ -677,9 +674,9 @@ void openReadingPipe(uint8_t child, uint64_t address)
   {
     // For pipes 2-5, only write the LSB
     if ( child < 2 )
-      writeRegBuff(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 5);
+      writeRegBuff(pgm_read_byte(&child_pipe[child]), (&address), 5);
     else
-      writeRegBuff(pgm_read_byte(&child_pipe[child]), reinterpret_cast<const uint8_t*>(&address), 1);
+      writeRegBuff(pgm_read_byte(&child_pipe[child]), (&address), 1);
 
     writeRegChar(pgm_read_byte(&child_payload_size[child]),payload_size);
 
@@ -755,16 +752,14 @@ void enableAckPayload(void)
 
 /****************************************************************************/
 
-void writeAckPayload(uint8_t pipe, const void* buf, uint8_t len)
+void writeAckPayload(uint8_t pipe, const uint8_t* buf, uint8_t len)
 {
-  const uint8_t* current = reinterpret_cast<const uint8_t*>(buf);
-
   csn(LOW);
   spiSendData( W_ACK_PAYLOAD | ( pipe & B111 ) );
   const uint8_t max_payload_size = 32;
   uint8_t data_len = min(len,max_payload_size);
   while ( data_len-- )
-    spiSendData(*current++);
+    spiSendData(*buf++);
 
   csn(HIGH);
 }
